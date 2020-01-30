@@ -25,7 +25,7 @@ public class Server {
             /*Dette må skje i en egen tråd */
             Socket client = listener.accept(); //Vi venter på en tilkobling
             System.out.println("Tilkoblet");
-            KlientThread klientThread=new KlientThread(client);
+            KlientThread klientThread=new KlientThread(client,klient);
             klient.add(klientThread);
             pool.execute(klientThread);
         }

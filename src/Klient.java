@@ -13,16 +13,19 @@ public class Klient {
 
     public static void main(String[] args) throws IOException {
         Socket socket =new Socket(SERVER_ID,SERVER_PORT); //Lager tilbkobling til server
-        BufferedReader input=new BufferedReader(new InputStreamReader(socket.getInputStream())); //Får data fra socket
+        ServerConnection serverConn=new ServerConnection(socket);
+        //BufferedReader input=new BufferedReader(new InputStreamReader(socket.getInputStream())); //Får data fra socket
         BufferedReader tastatur=new BufferedReader(new InputStreamReader(System.in)); //Tar inn data fra tastatur
         PrintWriter ut=new PrintWriter(socket.getOutputStream(),true); //Data som skal skrives ut
         System.out.println("Søk etter en email, skriv inn 'quit' for å avslutte");
+        new Thread(serverConn).start();
+
+
         while(true){
             String kommando=tastatur.readLine(); //Her leser vi inn kommando fra tastatur
             if(kommando.equals("quit"))break; //Avslutter med quit
             ut.println(kommando);
-            String serverResponse=input.readLine(); //Her leses responsen fra server
-            System.out.println("Server: "+serverResponse);
+            
 
         }
         socket.close();

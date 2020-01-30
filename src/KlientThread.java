@@ -4,16 +4,19 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.Buffer;
+import java.util.ArrayList;
 
 public class KlientThread implements Runnable {
     private Socket client;
     private BufferedReader in;
     private PrintWriter ut;
+    private ArrayList<KlientThread> clients;
 
-    public KlientThread(Socket clientSocket)throws IOException {
+    public KlientThread(Socket clientSocket, ArrayList<KlientThread> clients)throws IOException {
         this.client=clientSocket;
         in=new BufferedReader(new InputStreamReader(client.getInputStream()));
         ut=new PrintWriter(client.getOutputStream(),true);
+        this.clients=clients;
 
     }
 
@@ -23,6 +26,13 @@ public class KlientThread implements Runnable {
         try {
             while (true) {
                 String request = in.readLine(); //Leser inn data som er sendt fra socket
+                if(request.startsWith("fellesMelding")){
+                    int firstSpace=request.indexOf(" ");
+                    if(firstSpace!=-1){
+                        outToAll(request.substring(firstSpace+1));
+                    }
+
+                }
                 String returnString = Server.sokEmail(request);
                 ut.println(returnString);
             }
@@ -42,6 +52,11 @@ public class KlientThread implements Runnable {
         }
     }
 
+    private void outToAll(String msg) {
+        for(KlientThread aclient: clients){
+            aclient.ut.println(msg);
+        }
+    }
 
 
 }
